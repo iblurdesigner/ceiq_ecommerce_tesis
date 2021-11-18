@@ -41,6 +41,10 @@ export const useStyles = makeStyles((theme) => ({
   toolbar: {
     flexWrap: "wrap",
   },
+  grid: {
+    width: "100%",
+    margin: "0px",
+  },
   toolbarTitle: {
     flexGrow: 1,
   },
