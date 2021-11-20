@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Alert } from "@material-ui/lab";
 import Layout from "../../components/Layout";
 import getCommerce from "../../utils/commerce";
@@ -16,12 +16,22 @@ import {
   Slide,
   Typography,
 } from "@material-ui/core";
+
+import Router from "next/router";
+
+import { CART_RETRIEVE_SUCCESS } from "../../utils/constants";
+
 import { useStyles } from "../../utils/styles";
+import { Store } from "../../components/Store";
 
 export default function Product(props) {
   const { product } = props;
   const [quantity, setQuantity] = useState(1);
+
   const classes = useStyles();
+
+  const { state, dispatch } = useContext(Store);
+  const { cart } = state;
   console.log(product);
 
   const addToCartHandler = async () => {
@@ -31,7 +41,7 @@ export default function Product(props) {
     );
     if (lineItem) {
       const cartData = await commerce.cart.update(lineItem.id, {
-        quantity: product.inventory.available,
+        quantity: quantity,
       });
       dispatch({ type: CART_RETRIEVE_SUCCESS, payload: cartData.cart });
       Router.push("/cart");
@@ -43,7 +53,7 @@ export default function Product(props) {
   };
 
   return (
-    <Layout title="Home" commercePublicKey={props.commercePublicKey}>
+    <Layout title={product.name} commercePublicKey={props.commercePublicKey}>
       <Slide direction="up" in={true}>
         <Container>
           <Grid container spacing={1}>
@@ -120,7 +130,7 @@ export default function Product(props) {
                               id="quantity"
                               fullWidth
                               onChange={(e) => setQuantity(e.target.value)}
-                              value={product.inventory.available}
+                              value={product.quantity}
                             >
                               {[
                                 ...Array(product.inventory.available).keys(),

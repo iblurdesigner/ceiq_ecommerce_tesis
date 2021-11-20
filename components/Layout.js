@@ -1,3 +1,4 @@
+import { useContext, useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -6,11 +7,19 @@ import {
   Link,
   Toolbar,
   Typography,
+  Badge,
+  CircularProgress,
 } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import Head from "next/head";
 import NextLink from "next/link";
 import { theme, useStyles } from "../utils/styles";
+import { Store } from "./Store";
+import {
+  CART_RETRIEVE_REQUEST,
+  CART_RETRIEVE_SUCCESS,
+} from "../utils/constants";
+import getCommerce from "../utils/commerce";
 
 export default function Layout({
   children,
@@ -18,6 +27,19 @@ export default function Layout({
   title = "CEIQ commerce",
 }) {
   const classes = useStyles();
+  const { state, dispatch } = useContext(Store);
+  const { cart } = state;
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      const commerce = getCommerce(commercePublicKey);
+      dispatch({ type: CART_RETRIEVE_REQUEST });
+      const cartData = await commerce.cart.retrieve();
+      dispatch({ type: CART_RETRIEVE_SUCCESS, payload: cartData });
+    };
+    fetchCart();
+  }, []);
+
   return (
     <>
       <Head>
@@ -57,7 +79,15 @@ export default function Layout({
                   href="/cart"
                   className={classes.link}
                 >
-                  Cart
+                  {cart.loading ? (
+                    <CircularProgress />
+                  ) : cart.data.total_items > 0 ? (
+                    <Badge badgeContent={cart.data.total_items} color="primary">
+                      CARRITO
+                    </Badge>
+                  ) : (
+                    "Cart"
+                  )}
                 </Link>
               </NextLink>
             </nav>
