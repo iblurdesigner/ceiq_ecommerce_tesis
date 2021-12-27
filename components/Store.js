@@ -3,9 +3,19 @@ import { createContext, useReducer } from "react";
 import {
   CART_RETRIEVE_REQUEST,
   CART_RETRIEVE_SUCCESS,
+  ORDER_SET,
 } from "../utils/constants";
 
 export const Store = createContext();
+
+const order =
+  typeof window !== "undefined" && window.localStorage.getItem("order_receipt")
+    ? JSON.parse(window.localStorage.getItem("order_receipt"))
+    : null;
+const initialState = {
+  cart: { loading: true },
+  order,
+};
 
 function reducer(state, action) {
   switch (action.type) {
@@ -19,18 +29,19 @@ function reducer(state, action) {
         ...state,
         cart: { loading: false, data: action.payload },
       };
+    case ORDER_SET:
+      return {
+        ...state,
+        order: action.payload,
+      };
     default:
       return state;
   }
 }
 
-const initialState = {
-  cart: { loading: true },
-  order: null,
-};
-
 export function StoreProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
   const value = { state, dispatch };
   return <Store.Provider value={value}>{props.children}</Store.Provider>;
 }

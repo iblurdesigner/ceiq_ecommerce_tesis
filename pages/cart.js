@@ -139,7 +139,7 @@ function Cart(props) {
                           color="primary"
                           onClick={proccessToCheckout}
                         >
-                          Procede a pagar
+                          Proceder a pagar
                         </Button>
                       )}
                     </ListItem>
